@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Profile(models.Model):
+    slug = models.CharField(max_length=100, unique=True)
     owner = models.ForeignKey('auth.User', related_name='profile', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     username = models.CharField(max_length=100,blank=True)

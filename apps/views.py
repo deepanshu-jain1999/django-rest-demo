@@ -8,6 +8,7 @@ from django.http import Http404
 from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework import permissions
+from rest_framework.authentication import TokenAuthentication
 from apps.permissions import IsOwnerOrReadOnly
 # from django.urls import reverse_lazy
 from rest_framework import mixins
@@ -16,48 +17,50 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.parsers import FormParser, MultiPartParser
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
-    """
-       This viewset automatically provides `list`, `create`, `retrieve`,
-       `update` and `destroy` actions.
-
-       Additionally we also provide an extra `highlight` action.
-     """
-
-    permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = ProfileSerializer
-    # parser_classes = (FormParser, MultiPartParser)
-
-    def get_queryset(self):
-        user = self.request.user
-        return Profile.objects.filter(owner=user)
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user,
-                        # datafile=self.request.data.get('datafile')
-                        )
-
-
-# class ProfileList(generics.ListCreateAPIView):
+# class ProfileViewSet(viewsets.ModelViewSet):
+#     """
+#        This viewset automatically provides `list`, `create`, `retrieve`,
+#        `update` and `destroy` actions.
+#
+#        Additionally we also provide an extra `highlight` action.
+#      """
+#
 #     permission_classes = (permissions.IsAuthenticated,)
 #     serializer_class = ProfileSerializer
+#     lookup_field = 'slug'
+#     # parser_classes = (FormParser, MultiPartParser)
 #
 #     def get_queryset(self):
 #         user = self.request.user
 #         return Profile.objects.filter(owner=user)
 #
 #     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-#
-#
-# class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
-#     permission_classes = (permissions.IsAuthenticated,)
-#     # queryset = Profile.objects.all()
-#     serializer_class = ProfileSerializer
-#
-#     def get_queryset(self):
-#         user = self.request.user
-#         return Profile.objects.filter(owner=user)
+#         serializer.save(owner=self.request.user,
+#                         # datafile=self.request.data.get('datafile')
+#                         )
+
+
+class ProfileList(generics.ListCreateAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Profile.objects.filter(owner=user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Profile.objects.filter(owner=user)
 #
 #
 
