@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
-from apps.serializers import ProfileSerializer, UserSerializer
+from apps.serializers import ProfileSerializer, UserSerializer, ChangePasswordSerializer
 from apps.models import Profile
 from rest_framework.response import Response
 from rest_framework import status
@@ -186,3 +186,24 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 #         user = self.request.user
 #         return User.objects.filter(username=user)
 
+from django.contrib.auth import authenticate
+
+
+class ChangePassword(APIView):
+    serializer_class = ChangePasswordSerializer
+    # permission_classes = (permissions.IsAuthenticated,)
+    # authentication_classes = (TokenAuthentication,)
+
+    def post(self, format=None, **kwargs, ):
+        serializer = self.serializer_class(data=self.request.data)
+        if serializer.is_valid():
+            old_password = serializer.validated_data['old_password']
+            new_password = serializer.validated_data['new_password']
+            user = authenticate(username=self.request.user.username, password=old_password)
+            if user:
+                user = self.request.user
+                user.set_password(new_password)
+                user.save()
+                return Response({'token': user.auth_token.key}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)

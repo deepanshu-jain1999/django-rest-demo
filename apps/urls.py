@@ -20,6 +20,7 @@ urlpatterns = [
 #     url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view(), name='user-detail'),
     url(r'^home/profile/$', views.ProfileList.as_view(), name='profile-list'),
     url(r'^home/profile/(?P<pk>[0-9]+)/$', views.ProfileDetail.as_view(), name='profile-detail'),
+    url(r'^home/profile/change_password/$', views.ChangePassword.as_view(), name='change-password'),
 ]
 
 urlpatterns += [

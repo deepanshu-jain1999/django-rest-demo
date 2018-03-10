@@ -33,3 +33,21 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'username', 'profile')
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(min_length=8)
+    new_password = serializers.CharField(min_length=8)
+    new_confirm_password = serializers.CharField(min_length=8)
+
+    class Meta:
+        def validate(self, attrs):
+            old_password = attrs.get('old_password')
+            new_password = attrs.get('new_password')
+            new_confirm_password = attrs.get('new_confirm_password')
+
+            if new_password != new_confirm_password:
+                message = "Enter the same password"
+                raise serializers.ValidationError(message)
+
+
+
+
